@@ -62,6 +62,5 @@ class DownloaderPeer:
             uploader_socket.close()
 
 if __name__ == "__main__":
-    x=0
     downloader = DownloaderPeer("localhost")
     downloader.start()
