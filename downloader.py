@@ -1,10 +1,12 @@
 import socket
 
 class DownloaderPeer:
-    port = 12556  # Assign the port directly as a class variable
+   # port = 12556  # Assign the port directly as a class variable
 
-    def __init__(self, host):
+    def __init__(self, host,port):
         self.host = host
+        self.port=port
+
 
     def start(self):
         try:
@@ -13,13 +15,14 @@ class DownloaderPeer:
                 raise ValueError("Please provide a non-empty file name.")
 
             self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.client_socket.connect((self.host, DownloaderPeer.port))  # Use the class variable
+            self.client_socket.connect((self.host, self.port))  # Use the class variable
             self.client_socket.send("downloader".encode())
             self.client_socket.recv(1024)  # Wait for server acknowledgment
 
             self.client_socket.send(file_name.encode())
-            uploader_port = int(self.client_socket.recv(1024).decode())
-            print(f"File found, connecting to uploader on port {uploader_port}")
+            uploader_port = self.client_socket.recv(1024).decode()
+            if uploader_port==int(uploader_port):
+                print(f"File found, connecting to uploader on port {uploader_port}")
 
             # Connect to the uploader and receive data
             self.connect_to_uploader_and_receive_data(uploader_port, file_name)
@@ -59,5 +62,6 @@ class DownloaderPeer:
             uploader_socket.close()
 
 if __name__ == "__main__":
+    x=0
     downloader = DownloaderPeer("localhost")
     downloader.start()

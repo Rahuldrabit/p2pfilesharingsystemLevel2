@@ -47,6 +47,10 @@ class FileServer:
             client_socket.close()
 
     def handle_uploader(self, client_socket):
+        x=client_socket.recv(1024).decode()
+        if x==int(x):
+            client_socket.send("send".encode())
+        
         try:
             files = client_socket.recv(8192).decode().split(",")
             with self.lock:
@@ -62,13 +66,14 @@ class FileServer:
             file_name = client_socket.recv(1024).decode()
             with self.lock:
                 if file_name in self.files:
-                    uploader_address = self.files[file_name]
-                    client_socket.send(str(uploader_address).encode())
+                    uploader_address = x
+                    client_socket.send(int(uploader_address).encode())
                 else:
                     client_socket.send("File not found".encode())
         except Exception as e:
             print(f"Error handling downloader: {e}")
 
 if __name__ == "__main__":
+    x=0
     server = FileServer("localhost", 8000)  # Specify the port number here
     server.run_server()
