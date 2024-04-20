@@ -16,11 +16,13 @@ class FileServer:
             server_socket.listen(5)
             print(f"Server listening on {self.host}:{self.port}")
 
-            while True:
-                client_socket, client_address = server_socket.accept()
-                print(f"Connection from {client_address}")
-                client_thread = threading.Thread(target=self.handle_client, args=(client_socket,))
-                client_thread.start()
+            
+            client_socket, client_address = server_socket.accept()
+            client_ip, client_port = client_address  # Unpack the tuple
+            print(f"Connection from IP: {client_ip}, Port: {client_port}")
+
+            client_thread = threading.Thread(target=self.handle_client, args=(client_socket,))
+            client_thread.start()
         except KeyboardInterrupt:
             print("Server is shutting down.")
         except Exception as e:

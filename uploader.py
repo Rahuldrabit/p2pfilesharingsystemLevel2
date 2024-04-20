@@ -99,7 +99,7 @@ if __name__ == "__main__":
     documents_path = os.path.expanduser("~/Documents")
 
     # Create an UploaderPeer instance with the documents path
-    uploader = UploaderPeer("localhost", documents_path)
+    uploader = UploaderPeer("localhost",8000, documents_path)
 
     # Start the uploader
     uploader.start()
