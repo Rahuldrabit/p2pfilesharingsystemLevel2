@@ -26,30 +26,36 @@ class UploaderPeer:
 
         # Create a comma-separated string of file names
         files_str = ",".join(self.file_names)
-
+        own_port=1122
         try:
             # Connect to the server and send the file names
             self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.client_socket.connect((self.host, self.port))
             self.client_socket.send("uploader".encode())
+            
+            
             self.client_socket.recv(1024).decode()  # Wait for server acknowledgment
-            self.client_socket.send(x.encode())
+            
             if self.client_socket.recv(1024).decode()=='send':
                 self.client_socket.send(files_str.encode())
                 print(f"Sent file names: {files_str}")
                 print("Files uploaded successfully")
+                
             else:
                 print("error in acknoledgement")    
+            own_address=self.client_socket.getsockname
+            own_port=own_address[1]
             self.client_socket.close()
         except Exception as e:
             print(f"error in trying connection with server{e}")
 
+        
         try:
             # Set up the uploader socket to listen for downloader connections
             self.upldr_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.upldr_socket.bind((self.host, x))
+            self.upldr_socket.bind((self.host, own_port))
             self.upldr_socket.listen(5)
-            print(f"Uploader listening on {self.host}:{x}")
+            print(f"Uploader listening on {self.host}:{own_port}")
 
             while True:
                 dwnldr_socket, dwnldr_address = self.upldr_socket.accept()
@@ -94,7 +100,7 @@ class UploaderPeer:
             print(f"Error reading file names: {e}")
 
 if __name__ == "__main__":
-    x=19555
+    #x=19555
     # Path to the Documents directory
     documents_path = os.path.expanduser("~/Documents")
 

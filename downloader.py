@@ -8,23 +8,24 @@ class DownloaderPeer:
 
     def start(self):
         try:
-            file_name = input("Enter a file name (with extension) to download: ")
-            if not file_name:
-                raise ValueError("Please provide a non-empty file name.")
-
+            
             self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.client_socket.connect((self.host, self.port))
             self.client_socket.send("downloader".encode())
             self.client_socket.recv(1024)  # Wait for server acknowledgment
 
+            file_name = input("Enter a file name (with extension) to download: ")
+            if not file_name:
+                raise ValueError("Please provide a non-empty file name.")
+
             self.client_socket.send(file_name.encode())
-            uploader_port_data = self.client_socket.recv(1024).decode()
+            uploader_port_data = self.client_socket.recv(1024)
             try:
-                uploader_port = int(uploader_port_data)
-                print(f"File found, connecting to uploader on port {uploader_port}")
+                uploader_port_data
+                print(f"File found, connecting to uploader on port {uploader_port_data}")
                 # Connect to the uploader and receive data
                 self.client_socket.close()
-                self.connect_to_uploader_and_receive_data(uploader_port, file_name)
+                self.connect_to_uploader_and_receive_data(uploader_port_data, file_name)
             except ValueError:
                 print("Received data is not a valid port number.")
 
@@ -33,10 +34,11 @@ class DownloaderPeer:
         finally:
             self.client_socket.close()
 
-    def connect_to_uploader_and_receive_data(self, uploader_port, file_name):
+    def connect_to_uploader_and_receive_data(self, uploader_port_data, file_name):
         try:
             uploader_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            uploader_socket.connect((self.host, int(uploader_port)))  # Ensure port is an integer
+            uploader_socket.connect((self.host, 1122))  # Ensure port is an integer
+            #uploader_socket.connect((self.host, int(uploader_port_data)))  # Ensure port is an integer
             print("Connected to uploader.")
             uploader_socket.send("downloader".encode())
 
