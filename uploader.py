@@ -82,12 +82,23 @@ class UploaderPeer:
                 print("Peer is not a downloader")
         except Exception as e:
             print(f"Error handling downloader: {e}")
-        finally:
             dwnldr_socket.close()
+        
+        
 
     def handle_file_name(self, dwnldr_socket, file_name):
         if file_name in self.file_names:
             dwnldr_socket.send("ready to receive file chunk".encode())
+            # Receive the file chunks and send them to the downloader
+            file_path = os.path.join(self.directory_path, file_name)
+            with open(file_path, 'rb') as file:
+                while True:
+                    chunk = file.read(1024)
+                    if not chunk:
+                        break
+                    dwnldr_socket.send(chunk)
+            print(f"File '{file_name}' sent successfully")
+            dwnldr_socket.close()
         else:
             dwnldr_socket.send("file not found".encode())
 
