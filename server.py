@@ -10,25 +10,25 @@ class FileServer:
         self.lock = threading.Lock()
 
     def run_server(self):
-        try:
-            server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            server_socket.bind((self.host, self.port))
-            server_socket.listen(5)
-            print(f"Server listening on {self.host}:{self.port}")
+        
+            try:
+                server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                server_socket.bind((self.host, self.port))
+                server_socket.listen(5)
+                print(f"Server listening on {self.host}:{self.port}")
+                
+                client_socket, client_address = server_socket.accept()
+                client_ip, client_port = client_address  # Unpack the tuple
+                print(f"Connection from IP: {client_ip}, Port: {client_port}")
 
-            
-            client_socket, client_address = server_socket.accept()
-            client_ip, client_port = client_address  # Unpack the tuple
-            print(f"Connection from IP: {client_ip}, Port: {client_port}")
-
-            client_thread = threading.Thread(target=self.handle_client, args=(client_socket,))
-            client_thread.start()
-        except KeyboardInterrupt:
-            print("Server is shutting down.")
-        except Exception as e:
-            print(f"Server error: {e}")
-        finally:
-            server_socket.close()
+                client_thread = threading.Thread(target=self.handle_client, args=(client_socket,))
+                client_thread.start()
+            except KeyboardInterrupt:
+                print("Server is shutting down.")
+            except Exception as e:
+                print(f"Server error: {e}")
+            finally:
+                server_socket.close()
 
     def handle_client(self, client_socket):
         try:
